@@ -195,8 +195,4 @@ setInterval(checkAndUpdate,5000);
 fetchWeather();
 setInterval(fetchWeather,30*60*1000);
 
-// Listen for storage changes from admin page in same browser
-window.addEventListener('storage',e=>{
-  if(e.key===STORAGE_KEY)loadToday();
-});
 </script></body></html>
