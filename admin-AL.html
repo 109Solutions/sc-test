@@ -32,9 +32,7 @@ input:focus{border-color:#6366f1}
 .savebtn:disabled{background:#999;cursor:not-allowed}
 .ok{display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;color:#166534;font-size:15px;font-weight:500;text-align:center;margin-top:12px}
 .resetbtn{width:100%;margin-top:10px;padding:12px;background:#fff;color:#999;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;cursor:pointer}
-</style></head>
-so adding it here?????
-<body>
+</style></head><body>
 <div class="container">
   <div class="header">
     <h1>📋 Schedule Manager</h1>
@@ -54,20 +52,6 @@ so adding it here?????
   <div class="ok" id="ok">✅ Display updated! The screen will refresh within 10 seconds.</div>
   <button class="resetbtn" onclick="reset()">↺ Reset to original PDF schedule</button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-const supabaseUrl = "https://ueoebotxeyanprdsodng.supabase.co";
-const supabaseKey = "sb_publishable_xKbZFZEN46Md7OBdFwFJoA_oxEQWcT5";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-function getLocalDateString(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
-}
-</script>
 <script>
 const WING='AL';
 const CALENDAR={"1": [["10:45", "Seated Exercise with Alia", "Assisted Living Room"], ["11:00", "Brain Games", "Assisted Living Room"], ["1:30", "Old Fashion Saying & Opposite Words", "Assisted Living Room"], ["2:30", "Baking with Alia", "Community Kitchen"], ["3:30", "Alphabet Dice Challenge", "Assisted Living Room"], ["7:00", "Movie Matinee", "Theatre"]], "2": [["10:00", "Seated Exercise with Active Living", "Active Living Room"], ["10:00", "Ann Marie Jewellery", ""], ["10:45", "Smoothie & News with Active Living", "Community Kitchen"], ["11:00", "Activity Booklet", "Lobby"], ["1:30", "Name That Tune", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Theatre"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:30", "Mindful Meditation", "Assisted Living Room"]], "3": [["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["10:15", "Today in the History", "Assisted Living Room"], ["10:45", "Coffee & Trivia", "Bistro & Pub"], ["12:45", "Blue Jays Game", "Theatre"], ["1:15", "Groups Quiz", "Assisted Living Room"], ["3:30", "Sunday Reset: 15 Min Stretch", "Active Living Room"], ["6:30", "Words In A Word with PSW", "Assisted Living Room"]], "4": [["9:30", "Upper Canada Mall", "Lobby"], ["9:45", "Gentlemen in Motion with Aidan", "Active Living Room"], ["10:00", "Easy Exercise", "Assisted Living Room"], ["10:45", "Guess That Smell (Aromatherapy)", "Assisted Living Room"], ["1:30", "Nine-Letter Word Puzzles", "Assisted Living Room"], ["2:30", "Baking with Maura", "Community Kitchen"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["7:00", "The Puzzle Club", "Game Room"]], "5": [["10:00", "Scenic Drive", "Lobby"], ["10:30", "Spring Card Art with Ann", "Art Studio"], ["11:15", "Mental Aerobics", "Assisted Living Room"], ["1:30", "Board Game", "Assisted Living Room"], ["2:00", "Groups Quiz", "Assisted Living Room"], ["2:30", "Games with Active Living", "Community Kitchen"], ["6:30", "Music and Movement with PSW", "Assisted Living Room"]], "6": [["10:00", "Mental Aerobics", "Assisted Living Room"], ["10:15", "Easy Exercise with Active Living", "Assisted Living Room"], ["11:00", "Mindful Sips After Yoga", "Community Kitchen"], ["1:30", "Art & Crafts", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Community Kitchen"], ["2:30", "Music Performance by Richard", "Memory Care"], ["2:30", "Food Committee Meeting", "Dining Room"], ["6:00", "Beach Ball Bounce with PSW", "Assisted Living Room"]], "7": [["10:00", "Music Therapy with Stephanie", "Assisted Living Room"], ["10:00", "Fitness Strength with Regina", "Active Living Room"], ["10:00", "United Church Service & Communion", "Theatre"], ["11:30", "Words That Start or End With", "Assisted Living Room"], ["2:30", "Gentlemen Model Train Building", "Art Studio"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["6:30", "Tic Tac Toe Toss with PSW", "Assisted Living Room"]], "8": [["10:45", "Seated Exercise with Alia", "Assisted Living Room"], ["11:00", "Brain Games", "Assisted Living Room"], ["1:30", "Old Fashion Saying & Opposite Words", "Assisted Living Room"], ["2:00", "Gateway Casinos Innisfil", "Lobby"], ["2:30", "Music Performance by Kent Mill", "Bistro & Pub"], ["3:30", "Alphabet Dice Challenge", "Assisted Living Room"], ["7:00", "Movie Matinee", "Theatre"]], "9": [["10:00", "Seated Exercise with Active Living", "Active Living Room"], ["10:45", "Smoothie & News with Active Living", "Community Kitchen"], ["11:00", "Activity Booklet", "Lobby"], ["1:30", "Name That Tune", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Theatre"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:30", "Group Jigsaw Puzzle", "Assisted Living Room"]], "10": [["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["10:15", "Today in the History", "Assisted Living Room"], ["10:45", "Coffee & Trivia", "Bistro & Pub"], ["1:15", "Groups Quiz", "Assisted Living Room"], ["2:30", "Movie Matinee & Popcorn", "Theatre"], ["3:30", "Sunday Reset: 15 Min Stretch", "Active Living Room"], ["6:30", "Words In A Word with PSW", "Assisted Living Room"]], "11": [["9:45", "Gentlemen in Motion with Aidan", "Active Living Room"], ["10:00", "Easy Exercise", "Assisted Living Room"], ["10:30", "Arts & Craft with Lisa", "Art Studio"], ["10:45", "Guess That Smell (Aromatherapy)", "Assisted Living Room"], ["1:30", "Nine-Letter Word Puzzles", "Assisted Living Room"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["7:00", "The Puzzle Club", "Game Room"]], "12": [["10:00", "Scenic Drive", "Lobby"], ["11:15", "Mental Aerobics", "Assisted Living Room"], ["1:30", "Board Game", "Assisted Living Room"], ["2:00", "Groups Quiz", "Assisted Living Room"], ["2:30", "Games with Active Living", "Community Kitchen"], ["2:30", "Ballroom Dancing with Derek", "Active Living Room"], ["6:30", "Music and Movement with PSW", "Assisted Living Room"]], "13": [["10:00", "Mental Aerobics", "Assisted Living Room"], ["10:35", "Chair Yoga with Firozeh", "Assisted Living Room"], ["11:00", "Mindful Sips After Yoga", "Community Kitchen"], ["1:30", "Art & Crafts", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Community Kitchen"], ["2:30", "Sing-Along with Frank", "Memory Care"], ["6:00", "Beach Ball Bounce with PSW", "Assisted Living Room"]], "14": [["10:00", "Fitness Strength with Regina", "Active Living Room"], ["10:00", "Flashcards", "Assisted Living Room"], ["10:30", "Art with Carmen", "Art Studio"], ["11:30", "Words That Start or End With", "Assisted Living Room"], ["2:30", "Gentlemen Model Train Building", "Art Studio"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["6:30", "Tic Tac Toe Toss with PSW", "Assisted Living Room"]], "15": [["10:00", "Garden Club with Becca", "Patio"], ["10:45", "Seated Exercise with Alia", "Assisted Living Room"], ["11:00", "Brain Games", "Assisted Living Room"], ["1:30", "Old Fashion Saying & Opposite Words", "Assisted Living Room"], ["2:30", "Music Performance with Fex & LeBlanc", "Bistro & Pub"], ["3:30", "Baking with Luisa", "Community Kitchen"], ["3:30", "Alphabet Dice Challenge", "Assisted Living Room"], ["7:00", "Movie Matinee", "Theatre"]], "16": [["10:00", "Seated Exercise with Active Living", "Active Living Room"], ["10:45", "Smoothie & News with Active Living", "Community Kitchen"], ["11:00", "Activity Booklet", "Lobby"], ["1:30", "Name That Tune", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Theatre"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:30", "Mindful Meditation", "Assisted Living Room"]], "17": [["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["10:15", "Today in the History", "Assisted Living Room"], ["10:45", "Coffee & Trivia", "Bistro & Pub"], ["1:15", "Groups Quiz", "Assisted Living Room"], ["2:30", "National Classic Movie Day", "Theatre"], ["3:30", "Sunday Reset: 15 Min Stretch", "Active Living Room"], ["6:30", "Words In A Word with PSW", "Assisted Living Room"]], "18": [["9:45", "Gentlemen in Motion with Aidan", "Active Living Room"], ["10:00", "Easy Exercise", "Assisted Living Room"], ["10:45", "Guess That Smell (Aromatherapy)", "Assisted Living Room"], ["1:30", "Nine-Letter Word Puzzles", "Assisted Living Room"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:00", "Dinner at Beer Town", "Lobby"], ["7:00", "The Puzzle Club", "Game Room"]], "19": [["10:00", "Scenic Drive", "Lobby"], ["10:30", "Art with Carmen", "Art Studio"], ["11:15", "Mental Aerobics", "Assisted Living Room"], ["1:30", "Board Game", "Assisted Living Room"], ["2:00", "Groups Quiz", "Assisted Living Room"], ["2:30", "Games with Active Living", "Community Kitchen"], ["2:30", "Hula Hoop Dance with Linda", "Bistro & Pub"], ["6:30", "Music and Movement with PSW", "Assisted Living Room"]], "20": [["10:00", "Mental Aerobics", "Assisted Living Room"], ["10:35", "Chair Yoga with Firozeh", "Assisted Living Room"], ["11:00", "Mindful Sips After Yoga", "Community Kitchen"], ["1:30", "Art & Crafts", "Assisted Living Room"], ["2:30", "Residents Council Meeting", "Theatre"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["3:30", "10 Cent Bingo", "Community Kitchen"], ["6:00", "Beach Ball Bounce with PSW", "Assisted Living Room"]], "21": [["10:00", "Music Therapy with Stephanie", "Assisted Living Room"], ["10:00", "Fitness Strength with Regina", "Active Living Room"], ["10:30", "Art with Carmen", "Art Studio"], ["11:30", "Words That Start or End With", "Assisted Living Room"], ["2:00", "East Gwillimbury Farmer's Market", "Bistro & Pub"], ["2:30", "Gentlemen Model Train Building", "Art Studio"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["6:30", "Tic Tac Toe Toss with PSW", "Assisted Living Room"]], "22": [["9:30", "Voices of Joy: Choir Performance", "Dining Room"], ["10:45", "Seated Exercise with Alia", "Assisted Living Room"], ["11:00", "Brain Games", "Assisted Living Room"], ["1:30", "Old Fashion Saying & Opposite Words", "Assisted Living Room"], ["2:00", "Longos Plaza", "Lobby"], ["2:30", "Live Music with Carl", "Bistro & Pub"], ["3:30", "Alphabet Dice Challenge", "Assisted Living Room"], ["7:00", "Movie Matinee", "Theatre"]], "23": [["10:00", "Seated Exercise with Active Living", "Active Living Room"], ["10:45", "Smoothie & News with Active Living", "Community Kitchen"], ["11:00", "Activity Booklet", "Lobby"], ["1:30", "Name That Tune", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Theatre"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:30", "Group Jigsaw Puzzle", "Assisted Living Room"]], "24": [["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["10:15", "Today in the History", "Assisted Living Room"], ["10:45", "Coffee & Trivia", "Bistro & Pub"], ["1:15", "Groups Quiz", "Assisted Living Room"], ["2:30", "Movie Matinee & Popcorn", "Theatre"], ["3:30", "Sunday Reset: 15 Min Stretch", "Active Living Room"], ["6:30", "Words In A Word with PSW", "Assisted Living Room"]], "25": [["9:45", "Gentlemen in Motion with Aidan", "Active Living Room"], ["10:00", "Easy Exercise", "Assisted Living Room"], ["10:30", "The Japanese Geisha by Lianne Harris", "Theatre"], ["10:45", "Guess That Smell (Aromatherapy)", "Assisted Living Room"], ["1:30", "Nine-Letter Word Puzzles", "Assisted Living Room"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["7:00", "The Puzzle Club", "Game Room"]], "26": [["10:00", "Scenic Drive", "Lobby"], ["10:30", "Art with Carmen", "Art Studio"], ["11:15", "Mental Aerobics", "Assisted Living Room"], ["1:30", "Board Game", "Assisted Living Room"], ["2:00", "Groups Quiz", "Assisted Living Room"], ["2:30", "Town Hall Meeting", "Dining Room"], ["6:30", "Music and Movement with PSW", "Assisted Living Room"]], "27": [["10:00", "Mental Aerobics", "Assisted Living Room"], ["10:00", "Easy Exercise with Active Living", "Assisted Living Room"], ["11:00", "Mindful Sips After Yoga", "Community Kitchen"], ["1:30", "Art & Crafts", "Assisted Living Room"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["2:30", "Cooking Demo with Jordan", "Community Kitchen"], ["3:30", "10 Cent Bingo", "Community Kitchen"], ["6:00", "Beach Ball Bounce with PSW", "Assisted Living Room"]], "28": [["10:00", "Fitness Strength with Regina", "Active Living Room"], ["10:00", "Flashcards", "Assisted Living Room"], ["11:30", "Words That Start or End With", "Assisted Living Room"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["3:00", "Back to the 70's", "Theatre"], ["6:30", "Tic Tac Toe Toss with PSW", "Assisted Living Room"]], "29": [["9:45", "Tanger Outlets Cookstown", "Lobby"], ["10:45", "Seated Exercise with Alia", "Assisted Living Room"], ["11:00", "Brain Games", "Assisted Living Room"], ["1:30", "Old Fashion Saying & Opposite Words", "Assisted Living Room"], ["2:30", "Music, Cake & Birthday Cheer", "Bistro & Pub"], ["3:30", "Alphabet Dice Challenge", "Assisted Living Room"], ["7:00", "Movie Matinee", "Theatre"]], "30": [["10:00", "Seated Exercise with Active Living", "Active Living Room"], ["10:45", "Smoothie & News with Active Living", "Community Kitchen"], ["11:00", "Activity Booklet", "Lobby"], ["1:30", "Name That Tune", "Assisted Living Room"], ["2:30", "10 Cent Bingo", "Theatre"], ["3:30", "Trivia with Active Living", "Community Kitchen"], ["6:30", "Mindful Meditation", "Assisted Living Room"]], "31": [["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["10:15", "Today in the History", "Assisted Living Room"], ["10:45", "Coffee & Trivia", "Bistro & Pub"], ["1:15", "Groups Quiz", "Assisted Living Room"], ["2:30", "Movie Matinee & Popcorn", "Theatre"], ["3:30", "Sunday Reset: 15 Min Stretch", "Active Living Room"], ["6:30", "Words In A Word with PSW", "Assisted Living Room"]]};
@@ -128,62 +112,15 @@ function addAct(){
   render();
 }
 
-async function save(){
-  const today = getLocalDateString();
-
-  const saveBtn = document.getElementById('savebtn');
-  if (saveBtn) {
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
-  }
-
-  const { error: deleteError } = await supabase
-    .from('events')
-    .delete()
-    .eq('wing', WING)
-    .eq('date', today);
-
-  if(deleteError){
-    alert('Error clearing old events in Supabase');
-    console.error(deleteError);
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.textContent = '✅ Update Display';
-    }
-    return;
-  }
-
-  const rows = activities.map(ev => ({
-    date: today,
-    wing: WING,
-    time: ev.time,
-    name: ev.name,
-    loc: ev.loc || '',
-    cancelled: !!ev.cancelled
+function save(){
+  // Save to localStorage — display page will pick it up instantly
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    date: now.toDateString(),
+    activities: activities
   }));
-
-  const { error: insertError } = await supabase
-    .from('events')
-    .insert(rows);
-
-  if(insertError){
-    alert('Error saving to Supabase');
-    console.error(insertError);
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.textContent = '✅ Update Display';
-    }
-    return;
-  }
-
   const ok=document.getElementById('ok');
   ok.style.display='block';
   setTimeout(()=>ok.style.display='none',4000);
-
-  if (saveBtn) {
-    saveBtn.disabled = false;
-    saveBtn.textContent = '✅ Update Display';
-  }
 }
 
 function reset(){
