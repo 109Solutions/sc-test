@@ -47,6 +47,14 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:0 6
 const supabaseUrl = "https://ueoebotxeyanprdsodng.supabase.co"
 const supabaseKey = "sb_publishable_xKbZFZEN46Md7OBdFwFJoA_oxEQWcT5"
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+function getLocalDateString(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 </script>
 <body>
 <div class="screen">
@@ -146,7 +154,7 @@ function renderEvents(events){
 }
 
 async function loadToday(){
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
 
   const { data, error } = await supabase
     .from('events')
