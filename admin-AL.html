@@ -34,28 +34,10 @@ input:focus{border-color:#6366f1}
 .resetbtn{width:100%;margin-top:10px;padding:12px;background:#fff;color:#999;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;cursor:pointer}
 </style></head>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
 <script>
 const supabaseUrl = "https://ueoebotxeyanprdsodng.supabase.co"
 const supabaseKey = "sb_publishable_xKbZFZEN46Md7OBdFwFJoA_oxEQWcT5"
-
-const supabase = window.supabase.createClient(
-  supabaseUrl,
-  supabaseKey
-)
-async function loadEvents() {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-
-  console.log(data)
-
-  if(error){
-    console.error(error)
-  }
-}
-
-loadEvents()
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 </script>
 <body>
 <div class="container">
@@ -137,12 +119,40 @@ function addAct(){
   render();
 }
 
-function save(){
-  // Save to localStorage — display page will pick it up instantly
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    date: now.toDateString(),
-    activities: activities
+async function save(){
+  const today = new Date().toISOString().split('T')[0];
+
+  const { error: deleteError } = await supabase
+    .from('events')
+    .delete()
+    .eq('wing', WING)
+    .eq('date', today);
+
+  if(deleteError){
+    alert('Error clearing old events from Supabase');
+    console.error(deleteError);
+    return;
+  }
+
+  const rows = activities.map(ev => ({
+    date: today,
+    wing: WING,
+    time: ev.time,
+    name: ev.name,
+    loc: ev.loc || '',
+    cancelled: !!ev.cancelled
   }));
+
+  const { error } = await supabase
+    .from('events')
+    .insert(rows);
+
+  if(error){
+    alert('Error saving to Supabase');
+    console.error(error);
+    return;
+  }
+
   const ok=document.getElementById('ok');
   ok.style.display='block';
   setTimeout(()=>ok.style.display='none',4000);
