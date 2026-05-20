@@ -32,7 +32,32 @@ input:focus{border-color:#6366f1}
 .savebtn:disabled{background:#999;cursor:not-allowed}
 .ok{display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;color:#166534;font-size:15px;font-weight:500;text-align:center;margin-top:12px}
 .resetbtn{width:100%;margin-top:10px;padding:12px;background:#fff;color:#999;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;cursor:pointer}
-</style></head><body>
+</style></head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabaseUrl = "https://ueoebotxeyanprdsodng.supabase.co"
+const supabaseKey = "sb_publishable_xKbZFZEN46Md7OBdFwFJoA_oxEQWcT5"
+
+const supabase = window.supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+)
+async function loadEvents() {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+
+  console.log(data)
+
+  if(error){
+    console.error(error)
+  }
+}
+
+loadEvents()
+</script>
+<body>
 <div class="container">
   <div class="header">
     <h1>📋 Schedule Manager</h1>
