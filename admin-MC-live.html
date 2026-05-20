@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sharon Corners Memory Care - Schedule Manager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Segoe UI,system-ui,sans-serif;background:#f4f6f9;min-height:100vh;padding:20px}
+.container{max-width:680px;margin:0 auto}
+.header{background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.header h1{font-size:20px;font-weight:700;color:#1a1a1a}
+.badge{display:inline-block;background:#eef0ff;color:#6366f1;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:6px}
+.dl{font-size:14px;color:#888;margin-top:4px}
+.info{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:14px;}
+.st{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin:16px 0 8px;padding:0 4px}
+.ac{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1.5px solid #eee;cursor:pointer;user-select:none;transition:all .15s}
+.ac:active{transform:scale(.98)}
+.ac.cancelled{background:#fff5f5;border-color:#fca5a5}
+.ac.cancelled .an{text-decoration:line-through;color:#aaa}
+.cb{width:32px;height:32px;border-radius:50%;border:2px solid #e0e0e0;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:all .15s}
+.ac.cancelled .cb{background:#ef4444;border-color:#ef4444;color:#fff}
+.ai{flex:1;min-width:0}
+.at{font-size:11px;font-weight:600;color:#999;text-transform:uppercase}
+.an{font-size:16px;font-weight:600;color:#1a1a1a;margin-top:2px}
+.al{font-size:12px;color:#bbb;margin-top:2px}
+.cx{font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;margin-top:3px}
+.ab{background:#fff;border-radius:12px;padding:18px;margin-top:6px;border:1.5px dashed #ddd}
+.ab h3{font-size:14px;font-weight:600;color:#666;margin-bottom:12px}
+.ar{display:flex;gap:8px;margin-bottom:10px}
+input{border:1.5px solid #e0e0e0;border-radius:8px;padding:10px 14px;font-size:15px;font-family:inherit;outline:none;width:100%}
+input:focus{border-color:#6366f1}
+.addbtn{background:#6366f1;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+.savebtn{width:100%;margin-top:20px;padding:16px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer}
+.savebtn:disabled{background:#999;cursor:not-allowed}
+.ok{display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px;color:#166534;font-size:15px;font-weight:500;text-align:center;margin-top:12px}
+.resetbtn{width:100%;margin-top:10px;padding:12px;background:#fff;color:#999;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;cursor:pointer}
+</style></head><body>
+<div class="container">
+  <div class="header">
+    <h1>📋 Schedule Manager</h1>
+    <div class="badge">Memory Care</div>
+    <div class="dl" id="dl"></div>
+  </div>
+  <div class="info">💡 Open the display page in another tab on the same browser — it will update automatically when you save.</div>
+  <div class="st">Today's activities — tap to cancel / uncancel</div>
+  <div id="alist"></div>
+  <div class="st">Add a new activity</div>
+  <div class="ab">
+    <h3>Add a new activity</h3>
+    <div class="ar"><input type="time" id="nt" style="width:130px;flex-shrink:0"><input type="text" id="nn" placeholder="Activity name"></div>
+    <div class="ar"><input type="text" id="nl" placeholder="Location (optional)"><button class="addbtn" onclick="addAct()">+ Add</button></div>
+  </div>
+  <button class="savebtn" id="savebtn" onclick="save()">✅ Update Display</button>
+  <div class="ok" id="ok">✅ Display updated! The screen will refresh within 10 seconds.</div>
+  <button class="resetbtn" onclick="reset()">↺ Reset to original PDF schedule</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const WING='MC';
+const CALENDAR={"1": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["11:15", "Brain Games", "Memory Care"], ["11:45", "Word Rhyme", "Memory Care"], ["1:30", "Hands & Hearts Creations", "Memory Care"], ["2:30", "Outdoor Meditation", "Memory Care"], ["4:00", "Fun Pong", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "2": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Ann Marie Jewellery", ""], ["11:15", "Fit & Fabulous: Ball Work Out", "Memory Care"], ["1:30", "Toss and Trivia", "Memory Care"], ["2:30", "From Oven to Heart", "Memory Care"], ["4:00", "Sports Games", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:00", "Docuseries", "Memory Care"]], "3": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["11:15", "Rhythm & Motion: Chair Dance", "Memory Care"], ["1:30", "Garden Visit", "Green House"], ["2:30", "Bean Bag Toss", "Memory Care"], ["4:00", "Fun and Focus", "Memory Care"], ["6:00", "Tongue Twister", "Memory Care"]], "4": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["10:45", "Memory Games with Active Living", "Memory Care"], ["11:30", "Toss and Trivia", "Memory Care"], ["1:30", "Creative Corner", "Memory Care"], ["2:30", "Game On with Ashley", "Memory Care"], ["4:00", "Pool Noodles Swing", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "5": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Scenic Drive", "Lobby"], ["11:15", "Morning Stretch & Breathing", "Memory Care"], ["1:30", "Sensory Stimulation", "Memory Care"], ["2:15", "Mental Aerobics & Smoothie Social", "Memory Care"], ["4:00", "Air Hockey with Active Living", "Memory Care"], ["6:00", "Tales & Togetherness", "Memory Care"]], "6": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "The Problem Solvers", "Memory Care"], ["1:30", "Painting with Friends", "Memory Care"], ["2:30", "Music Performance by Richard", "Memory Care"], ["2:30", "Food Committee Meeting", "Dining Room"], ["4:00", "Bean Bag Kick", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:15", "Docuseries", "Memory Care"]], "7": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "News with Active Living", "Memory Care"], ["10:45", "Mind & Motion with Regina", "Memory Care"], ["11:00", "Music Therapy with Stephanie", "Memory Care"], ["11:30", "Think Fast", "Memory Care"], ["1:30", "Fun and Focus", "Memory Care"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["4:00", "Balloon Volleyball", "Memory Care"], ["6:00", "Mindful Scents", "Memory Care"]], "8": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["11:15", "Brain Games", "Memory Care"], ["11:45", "Word Rhyme", "Memory Care"], ["1:30", "Hands & Hearts Creations", "Memory Care"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["4:00", "Fun Pong", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "9": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "Fit & Fabulous: Ball Work Out", "Memory Care"], ["1:30", "Toss and Trivia", "Memory Care"], ["2:30", "From Oven to Heart", "Memory Care"], ["4:00", "Sports Games", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:00", "Docuseries", "Memory Care"]], "10": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["11:15", "Rhythm & Motion: Chair Dance", "Memory Care"], ["1:30", "Garden Visit", "Green House"], ["2:30", "Bean Bag Toss", "Memory Care"], ["4:00", "Fun and Focus", "Memory Care"], ["6:00", "Tongue Twister", "Memory Care"]], "11": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["10:45", "Memory Games with Active Living", "Memory Care"], ["11:30", "Toss and Trivia", "Memory Care"], ["1:30", "Creative Corner", "Memory Care"], ["2:30", "Game On with Ashley", "Memory Care"], ["4:00", "Pool Noodles Swing", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "12": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Scenic Drive", "Lobby"], ["11:15", "Morning Stretch & Breathing", "Memory Care"], ["1:30", "Sensory Stimulation", "Memory Care"], ["2:15", "Mental Aerobics & Smoothie Social", "Memory Care"], ["4:00", "Air Hockey with Active Living", "Memory Care"], ["6:00", "Tales & Togetherness", "Memory Care"]], "13": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Yoga with Firozeh", "Memory Care"], ["11:15", "The Problem Solvers", "Memory Care"], ["1:30", "Painting with Friends", "Memory Care"], ["2:30", "Sing-Along with Frank", "Memory Care"], ["4:00", "Bean Bag Kick", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:15", "Docuseries", "Memory Care"]], "14": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "News with Active Living", "Memory Care"], ["10:45", "Mind & Motion with Regina", "Memory Care"], ["11:30", "Think Fast", "Memory Care"], ["1:30", "Fun and Focus", "Memory Care"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["4:00", "Balloon Volleyball", "Memory Care"], ["6:00", "Mindful Scents", "Memory Care"]], "15": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["11:15", "Brain Games", "Memory Care"], ["11:45", "Word Rhyme", "Memory Care"], ["1:30", "Hands & Hearts Creations", "Memory Care"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["4:00", "Fun Pong", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "16": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "Fit & Fabulous: Ball Work Out", "Memory Care"], ["1:30", "Toss and Trivia", "Memory Care"], ["2:30", "From Oven to Heart", "Memory Care"], ["4:00", "Sports Games", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:00", "Docuseries", "Memory Care"]], "17": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["11:15", "Rhythm & Motion: Chair Dance", "Memory Care"], ["1:30", "Garden Visit", "Green House"], ["2:30", "Bean Bag Toss", "Memory Care"], ["4:00", "Fun and Focus", "Memory Care"], ["6:00", "Tongue Twister", "Memory Care"]], "18": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["10:45", "Memory Games with Active Living", "Memory Care"], ["11:30", "Toss and Trivia", "Memory Care"], ["1:30", "Creative Corner", "Memory Care"], ["2:30", "Game On with Ashley", "Memory Care"], ["4:00", "Pool Noodles Swing", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "19": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Scenic Drive", "Lobby"], ["11:15", "Morning Stretch & Breathing", "Memory Care"], ["1:30", "Sensory Stimulation", "Memory Care"], ["2:15", "Mental Aerobics & Smoothie Social", "Memory Care"], ["4:00", "Air Hockey with Active Living", "Memory Care"], ["6:00", "Tales & Togetherness", "Memory Care"]], "20": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Yoga with Firozeh", "Memory Care"], ["11:15", "The Problem Solvers", "Memory Care"], ["1:30", "Painting with Friends", "Memory Care"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["4:00", "Bean Bag Kick", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:15", "Docuseries", "Memory Care"]], "21": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "News with Active Living", "Memory Care"], ["10:45", "Mind & Motion with Regina", "Memory Care"], ["11:00", "Music Therapy with Stephanie", "Memory Care"], ["11:30", "Think Fast", "Memory Care"], ["1:30", "Fun and Focus", "Memory Care"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["4:00", "Balloon Volleyball", "Memory Care"], ["6:00", "Mindful Scents", "Memory Care"]], "22": [["9:30", "Voices of Joy: Choir Performance", "Dining Room"], ["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["11:15", "Brain Games", "Memory Care"], ["11:45", "Word Rhyme", "Memory Care"], ["1:30", "Hands & Hearts Creations", "Memory Care"], ["2:30", "Outdoor Meditation", "Memory Care"], ["4:00", "Fun Pong", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "23": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "Fit & Fabulous: Ball Work Out", "Memory Care"], ["1:30", "Toss and Trivia", "Memory Care"], ["2:30", "From Oven to Heart", "Memory Care"], ["4:00", "Sports Games", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:00", "Docuseries", "Memory Care"]], "24": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["11:15", "Rhythm & Motion: Chair Dance", "Memory Care"], ["1:30", "Garden Visit", "Green House"], ["2:30", "Bean Bag Toss", "Memory Care"], ["4:00", "Fun and Focus", "Memory Care"], ["6:00", "Tongue Twister", "Memory Care"]], "25": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["10:45", "Memory Games with Active Living", "Memory Care"], ["11:30", "Toss and Trivia", "Memory Care"], ["1:30", "Creative Corner", "Memory Care"], ["2:30", "Game On with Ashley", "Memory Care"], ["4:00", "Pool Noodles Swing", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "26": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Scenic Drive", "Lobby"], ["11:15", "Morning Stretch & Breathing", "Memory Care"], ["1:30", "Sensory Stimulation", "Memory Care"], ["2:15", "Mental Aerobics & Smoothie Social", "Memory Care"], ["2:30", "Town Hall Meeting", "Dining Room"], ["4:00", "Air Hockey with Active Living", "Memory Care"], ["6:00", "Tales & Togetherness", "Memory Care"]], "27": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "The Problem Solvers", "Memory Care"], ["1:30", "Painting with Friends", "Memory Care"], ["2:30", "Pink Lady - Music & Movement", "Memory Care"], ["4:00", "Bean Bag Kick", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:15", "Docuseries", "Memory Care"]], "28": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "News with Active Living", "Memory Care"], ["10:45", "Mind & Motion with Regina", "Memory Care"], ["11:30", "Think Fast", "Memory Care"], ["1:30", "Fun and Focus", "Memory Care"], ["2:30", "Sweet Scenic Drive", "Lobby"], ["3:00", "Back to the 70's", "Theatre"], ["4:00", "Balloon Volleyball", "Memory Care"], ["6:00", "Mindful Scents", "Memory Care"]], "29": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Chair Fitness with Active Living", "Memory Care"], ["11:15", "Brain Games", "Memory Care"], ["11:45", "Word Rhyme", "Memory Care"], ["1:30", "Hands & Hearts Creations", "Memory Care"], ["2:30", "Sing-Along with Frank", "Memory Care"], ["4:00", "Fun Pong", "Memory Care"], ["6:00", "Reading Aloud", "Memory Care"]], "30": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["11:15", "Fit & Fabulous: Ball Work Out", "Memory Care"], ["1:30", "Toss and Trivia", "Memory Care"], ["2:30", "From Oven to Heart", "Memory Care"], ["4:00", "Sports Games", "Memory Care"], ["6:00", "Evening Reset", "Memory Care"], ["7:00", "Docuseries", "Memory Care"]], "31": [["9:45", "Morning Moments: Date & Weather", "Memory Care"], ["10:00", "Sunday Worship - Hope United Church (Virtual)", "Theatre"], ["11:15", "Rhythm & Motion: Chair Dance", "Memory Care"], ["1:30", "Garden Visit", "Green House"], ["2:30", "Bean Bag Toss", "Memory Care"], ["4:00", "Fun and Focus", "Memory Care"], ["6:00", "Tongue Twister", "Memory Care"]]};
+const LOCS={"L": "Lobby", "GYM": "Active Living Room", "GR": "Game Room", "TH": "Theatre", "BP": "Bistro & Pub", "CK": "Community Kitchen", "AS": "Art Studio", "DR": "Dining Room", "P": "Patio", "AL": "Assisted Living Room", "MC": "Memory Care", "GH": "Green House"};
+const STORAGE_KEY='sc_schedule_'+WING;
+
+function expandLoc(l){return LOCS[l]||l||'';}
+function parseMins(t){
+  const m=t.match(/(\d{1,2}):(\d{2})/);if(!m)return -1;
+  let h=parseInt(m[1]),min=parseInt(m[2]);if(h<8)h+=12;return h*60+min;
+}
+function fmtTime(t){
+  const m=t.match(/(\d{1,2}):(\d{2})/);if(!m)return t;
+  let h=parseInt(m[1]),min=m[2];if(h<8)h+=12;
+  return (h%12||12)+':'+min+' '+(h>=12?'PM':'AM');
+}
+
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now=new Date();
+const SUPABASE_URL='https://ueeobotxeyanprdsodng.supabase.co';
+const SUPABASE_KEY='https://ueoebotxeyanprdsodng.supabase.co/rest/v1/';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const TABLE='schedule_overrides';
+
+document.getElementById('dl').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+
+let activities=[];
+
+function todayISO(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function rowId(){ return WING+'_'+todayISO(); }
+
+function init(){
+  const month=now.getMonth()+1,day=now.getDate();
+  const base=(month===5&&CALENDAR[day])?CALENDAR[day]:[];
+  activities=base.map(ev=>({time:ev[0],name:ev[1],loc:expandLoc(ev[2]||''),cancelled:false}));
+  activities.sort((a,b)=>parseMins(a.time)-parseMins(b.time));
+}
+
+function render(){
+  const list=document.getElementById('alist');
+  if(!activities.length){list.innerHTML='<p style="color:#bbb;text-align:center;padding:20px">No activities for today.</p>';return;}
+  list.innerHTML=activities.map((ev,i)=>`
+    <div class="ac${ev.cancelled?' cancelled':''}" onclick="tog(${i})">
+      <div class="cb">${ev.cancelled?'✕':'✓'}</div>
+      <div class="ai">
+        <div class="at">${fmtTime(ev.time)}</div>
+        <div class="an">${ev.name}</div>
+        ${ev.loc?`<div class="al">📍 ${ev.loc}</div>`:''}
+        ${ev.cancelled?'<div class="cx">Cancelled</div>':''}
+      </div>
+    </div>`).join('');
+}
+
+function tog(i){activities[i].cancelled=!activities[i].cancelled;render();}
+
+function addAct(){
+  const t=document.getElementById('nt').value;
+  const n=document.getElementById('nn').value.trim();
+  const l=document.getElementById('nl').value.trim();
+  if(!t||!n){alert('Please enter a time and name.');return;}
+  const h=parseInt(t.split(':')[0]),m=t.split(':')[1];
+  activities.push({time:(h%12||12)+':'+m+' '+(h>=12?'PM':'AM'),name:n,loc:l,cancelled:false});
+  activities.sort((a,b)=>parseMins(a.time)-parseMins(b.time));
+  document.getElementById('nt').value='';document.getElementById('nn').value='';document.getElementById('nl').value='';
+  render();
+}
+
+async function loadFromSupabase(){
+  init();
+  try{
+    const { data, error } = await db.from(TABLE).select('activities').eq('id', rowId()).maybeSingle();
+    if(error) throw error;
+    if(data && Array.isArray(data.activities)) activities=data.activities;
+  }catch(e){
+    console.warn('Supabase load failed, using local fallback:', e.message);
+    try{
+      const saved=localStorage.getItem(STORAGE_KEY);
+      if(saved){
+        const data=JSON.parse(saved);
+        if(data.date===now.toDateString()&&data.activities) activities=data.activities;
+      }
+    }catch(_e){}
+  }
+  render();
+}
+
+async function save(){
+  try{
+    const payload={ id:rowId(), wing:WING, schedule_date:todayISO(), activities:activities, updated_at:new Date().toISOString() };
+    const { error } = await db.from(TABLE).upsert(payload);
+    if(error) throw error;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({date:now.toDateString(),activities}));
+    const ok=document.getElementById('ok');
+    ok.textContent='Saved live. Display screens will update automatically.';
+    ok.style.display='block';
+    setTimeout(()=>ok.style.display='none',4000);
+  }catch(e){
+    alert('Could not save to Supabase: '+e.message+'\nCheck your publishable key, table, and RLS policies.');
+  }
+}
+
+async function reset(){
+  if(!confirm('Reset to the original PDF schedule?'))return;
+  try{ await db.from(TABLE).delete().eq('id', rowId()); }catch(e){ console.warn(e); }
+  localStorage.removeItem(STORAGE_KEY);
+  init();render();
+}
+
+function startRealtime(){
+  db.channel('schedule_'+WING)
+    .on('postgres_changes', {event:'*', schema:'public', table:TABLE, filter:'wing=eq.'+WING}, payload=>{
+      if(!payload.new || payload.new.id===rowId() || (payload.old && payload.old.id===rowId())) loadFromSupabase();
+    })
+    .subscribe();
+}
+
+loadFromSupabase();
+startRealtime();
+</script></body></html>
