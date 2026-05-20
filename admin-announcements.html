@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Announcements Manager - Sharon Corners</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Segoe UI, system-ui, sans-serif; background: #f4f6f9; min-height: 100vh; padding: 20px; }
+  .container { max-width: 720px; margin: 0 auto; }
+  .header { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .header h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .header p { font-size: 14px; color: #999; margin-top: 4px; }
+  .info { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #92400e; margin-bottom: 16px; }
+  .st { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; margin: 20px 0 10px; padding: 0 4px; }
+  .form-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 16px; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+  label { font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; font-size: 15px; font-family: inherit; outline: none; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: #6366f1; }
+  textarea { resize: vertical; min-height: 120px; }
+  .savebtn { width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .ok { display: none; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px; color: #166534; font-size: 14px; text-align: center; margin-top: 10px; }
+  .ann-card { background: #fff; border-radius: 12px; padding: 16px 18px 16px 24px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1.5px solid #eee; position: relative; overflow: hidden; }
+  .ann-stripe { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; border-radius: 12px 0 0 12px; }
+  .ann-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .ann-dept { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 4px; }
+  .ann-subject { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .ann-body { font-size: 14px; color: #555; margin-top: 4px; line-height: 1.5; white-space: pre-wrap; }
+  .ann-meta { font-size: 12px; color: #bbb; margin-top: 6px; }
+  .delbtn { background: #fff5f5; border: 1.5px solid #fca5a5; color: #ef4444; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+  .empty { text-align: center; color: #bbb; padding: 30px; font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📢 Announcements Manager</h1>
+    <p>Post memos and announcements to the display screen</p>
+  </div>
+  <div class="info">💡 Open the announcements display in another tab on the same browser — it will update automatically.</div>
+
+  <div class="st">Post a new announcement</div>
+  <div class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Department</label>
+        <select id="dept">
+          <option>Culinary</option>
+          <option>Maintenance</option>
+          <option>Executive Director</option>
+          <option>Office Manager</option>
+          <option>Health &amp; Wellness</option>
+          <option>Active Living</option>
+          <option>General</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>To</label>
+        <input type="text" id="to" placeholder="All Residents, All Staff, etc.">
+      </div>
+      <div class="form-group">
+        <label>From</label>
+        <input type="text" id="from" placeholder="Your name / title">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Subject</label>
+      <input type="text" id="subject" placeholder="Announcement subject line">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Message</label>
+      <textarea id="body" placeholder="Type your memo or announcement here..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Show From</label>
+        <input type="datetime-local" id="startTime">
+      </div>
+      <div class="form-group">
+        <label>Show Until</label>
+        <input type="datetime-local" id="endTime">
+      </div>
+    </div>
+    <button class="savebtn" onclick="post()">📢 Post to Display</button>
+    <div class="ok" id="ok">✅ Posted! Appears on display within 10 seconds.</div>
+  </div>
+
+  <div class="st">Posted announcements</div>
+  <div id="ann-list"></div>
+</div>
+<script>
+const STORAGE_KEY = 'sc_announcements';
+const DEPT_COLORS = {"Culinary": "#f97316", "Maintenance": "#64748b", "Executive Director": "#6366f1", "Office Manager": "#0ea5e9", "Health & Wellness": "#22c55e", "Active Living": "#14b8a6", "General": "#a855f7"};
+
+function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e) { return []; } }
+function save(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+function fmt(dt) {
+  if (!dt) return '';
+  return new Date(dt).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function renderList() {
+  const list = document.getElementById('ann-list');
+  const anns = load();
+  if (!anns.length) { list.innerHTML='<div class="empty">No announcements posted yet.</div>'; return; }
+  list.innerHTML = anns.map((a,i) => {
+    const color = DEPT_COLORS[a.dept]||'#6366f1';
+    return `<div class="ann-card">
+      <div class="ann-stripe" style="background:${color}"></div>
+      <div class="ann-header">
+        <div style="flex:1;min-width:0">
+          <div class="ann-dept" style="background:${color}20;color:${color}">${a.dept}</div>
+          ${a.subject?`<div class="ann-subject">${a.subject}</div>`:''}
+          ${a.to||a.from?`<div class="ann-meta">${a.to?'To: '+a.to:''} ${a.from?'· From: '+a.from:''}</div>`:''}
+          <div class="ann-body">${a.body}</div>
+          <div class="ann-meta">
+            ${a.startTime?'From: '+fmt(a.startTime):''}
+            ${a.endTime?' · Until: '+fmt(a.endTime):''}
+            ${!a.startTime&&!a.endTime?'Posted: '+fmt(a.createdAt):''}
+          </div>
+        </div>
+        <button class="delbtn" onclick="del(${i})">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function post() {
+  const body = document.getElementById('body').value.trim();
+  if (!body) { alert('Please enter a message.'); return; }
+  const anns = load();
+  anns.unshift({
+    id: Date.now(),
+    dept: document.getElementById('dept').value,
+    to: document.getElementById('to').value.trim(),
+    from: document.getElementById('from').value.trim(),
+    subject: document.getElementById('subject').value.trim(),
+    body,
+    startTime: document.getElementById('startTime').value||null,
+    endTime: document.getElementById('endTime').value||null,
+    createdAt: new Date().toISOString()
+  });
+  save(anns);
+  ['body','subject','to','from','endTime'].forEach(id => document.getElementById(id).value='');
+  const ok=document.getElementById('ok');
+  ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',4000);
+  renderList();
+}
+
+function del(i) {
+  if (!confirm('Remove this announcement from the display?')) return;
+  const anns=load(); anns.splice(i,1); save(anns); renderList();
+}
+
+// Default start time = now
+const now=new Date(); now.setSeconds(0,0);
+document.getElementById('startTime').value=now.toISOString().slice(0,16);
+renderList();
+</script>
+</body>
+</html>

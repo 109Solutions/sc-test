@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menu Manager - Sharon Corners</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Segoe UI, system-ui, sans-serif; background: #f4f6f9; min-height: 100vh; padding: 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  .header { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .header h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .header p { font-size: 14px; color: #999; margin-top: 4px; }
+
+  /* DATE SELECTOR */
+  .date-nav { background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; gap: 12px; }
+  .date-nav label { font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .date-nav input[type=date] { border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 15px; font-family: inherit; outline: none; flex: 1; }
+  .date-nav input[type=date]:focus { border-color: #f97316; }
+  .today-btn { background: #f97316; color: #fff; border: none; border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+  /* MEAL SECTIONS */
+  .meal-section { background: #fff; border-radius: 16px; padding: 0; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; }
+  .meal-section-header { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .meal-section-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .meal-section-body { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .lunch-header { border-top: 5px solid #0ea5e9; }
+  .dinner-header { border-top: 5px solid #6366f1; }
+  .lunch-title { color: #0ea5e9; }
+  .dinner-title { color: #6366f1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  input[type=text], textarea { border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 15px; font-family: inherit; outline: none; width: 100%; }
+  input[type=text]:focus, textarea:focus { border-color: #f97316; }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .sides-list { display: flex; flex-direction: column; gap: 8px; }
+  .side-row { display: flex; gap: 8px; align-items: center; }
+  .side-row input { flex: 1; }
+  .remove-side { background: #fff5f5; border: 1.5px solid #fca5a5; color: #ef4444; border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .add-side-btn { background: #f8faff; border: 1.5px dashed #c7d2fe; color: #6366f1; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 4px; }
+
+  /* PREVIEW CARD */
+  .preview { background: #f8faff; border: 1.5px solid #e0e7ff; border-radius: 14px; padding: 20px 24px; margin-bottom: 16px; }
+  .preview-title { font-size: 13px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .preview-meal { margin-bottom: 16px; }
+  .preview-meal-title { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+  .preview-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 14px; }
+  .preview-label { font-weight: 600; color: #999; min-width: 80px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; }
+  .preview-val { color: #333; line-height: 1.4; }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 12px; margin-top: 8px; }
+  .save-btn { flex: 1; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .clear-btn { padding: 15px 20px; background: #fff; color: #999; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 14px; cursor: pointer; }
+  .ok { display: none; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px; color: #166534; font-size: 14px; text-align: center; margin-top: 10px; }
+
+  .info { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #92400e; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🍽️ Menu Manager</h1>
+    <p>Add or edit today's lunch and dinner menu — updates the display instantly</p>
+  </div>
+
+  <div class="info">💡 Open the menu display in another tab — it updates automatically when you save.</div>
+
+  <div class="date-nav">
+    <label>Date</label>
+    <input type="date" id="selected-date">
+    <button class="today-btn" onclick="setToday()">Today</button>
+  </div>
+
+  <!-- LUNCH -->
+  <div class="meal-section">
+    <div class="meal-section-header lunch-header">
+      <div class="meal-section-title lunch-title">🌤️ Lunch Menu</div>
+      <span style="font-size:13px;color:#aaa">11:30 a.m. – 2:00 p.m.</span>
+    </div>
+    <div class="meal-section-body">
+      <div class="form-group">
+        <label>🥣 Soup / Starter</label>
+        <input type="text" id="l-starter" placeholder="e.g. Butternut Squash Soup (GF)">
+      </div>
+      <div class="form-group">
+        <label>🍽️ Entrée</label>
+        <textarea id="l-entree" placeholder="e.g. BBQ Canadian Burger with Bacon and French Fries"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Side Dishes <span style="font-weight:400;color:#bbb">(optional)</span></label>
+        <div class="sides-list" id="l-sides"></div>
+        <button class="add-side-btn" onclick="addSide('l')">+ Add Side Dish</button>
+      </div>
+      <div class="form-group">
+        <label>🍰 Dessert</label>
+        <input type="text" id="l-dessert" placeholder="e.g. Ice Cream Sundae">
+      </div>
+    </div>
+  </div>
+
+  <!-- DINNER -->
+  <div class="meal-section">
+    <div class="meal-section-header dinner-header">
+      <div class="meal-section-title dinner-title">🌙 Dinner Menu</div>
+      <span style="font-size:13px;color:#aaa">4:30 p.m. – 7:00 p.m.</span>
+    </div>
+    <div class="meal-section-body">
+      <div class="form-group">
+        <label>🥣 Soup / Starter</label>
+        <input type="text" id="d-starter" placeholder="e.g. Tuscan Bean Soup (GF)">
+      </div>
+      <div class="form-group">
+        <label>🍽️ Entrée</label>
+        <textarea id="d-entree" placeholder="e.g. Lemon Herb Salmon with Dill Hollandaise Sauce"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Side Dishes <span style="font-weight:400;color:#bbb">(optional)</span></label>
+        <div class="sides-list" id="d-sides"></div>
+        <button class="add-side-btn" onclick="addSide('d')">+ Add Side Dish</button>
+      </div>
+      <div class="form-group">
+        <label>🍰 Dessert</label>
+        <input type="text" id="d-dessert" placeholder="e.g. Cherry Pie">
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview" id="preview" style="display:none">
+    <div class="preview-title">👁️ Preview</div>
+    <div id="preview-content"></div>
+  </div>
+
+  <div class="actions">
+    <button class="save-btn" onclick="saveMenu()">✅ Save & Update Display</button>
+    <button class="clear-btn" onclick="clearForm()">↺ Clear</button>
+  </div>
+  <div class="ok" id="ok">✅ Menu saved! The display will update within 30 seconds.</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'sc_menus';
+const DEFAULT_MENUS = {"2026-05-18": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Roasted Vegetables and Pork Soup", "entree": "Grilled Corned Beef Sandwich on Rye with Sauerkraut and Fries", "sides": [], "dessert": "Ice Cream Sundae with Strawberries"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Roasted Vegetables and Pork Soup", "entree": "Clove and Pineapple Glazed Ham with Apple Sauce", "sides": ["Scalloped Potato", "Honey Glazed Carrots", "Cauliflower"], "dessert": "Carrot Cake"}}, "2026-05-19": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Butternut Squash Soup (GF)", "entree": "BBQ Canadian Burger with Bacon, Canadian Cheddar and Molson Canadian BBQ Sauce with French Fries", "sides": [], "dessert": "Apple and Raisin Bread Pudding with Caramel"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Butternut Squash Soup (GF)", "entree": "Vegetarian Lasagna with Mozzarella and Fresh Tomato Sauce", "sides": ["Garlic Bread", "Buttered Peas", "Roasted Peppers"], "dessert": "Strawberry Mousse and Blueberries"}}, "2026-05-20": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Cream of Tomato Soup (GF)", "entree": "Deviled Eggs with Gremolata and Crispy Bacon with Garden Salad and Warm Roll", "sides": [], "dessert": "Fresh Fruit"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Cream of Tomato Soup (GF)", "entree": "Meatloaf with Onion Gravy", "sides": ["Mashed Potatoes", "Roasted Mushrooms", "Honey Roasted Carrots"], "dessert": "Lemon Streusel Cake"}}, "2026-05-21": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Tuscan Bean Soup (GF)", "entree": "Coconut Shrimp with Sweet Chili Sauce and Rice Noodle Salad", "sides": [], "dessert": "Mandarins and Cream"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Tuscan Bean Soup (GF)", "entree": "Lemon Herb Salmon with Dill Hollandaise Sauce", "sides": ["Roasted Baby Potatoes", "Roasted Peppers", "Asparagus"], "dessert": "Pudding with Berry Compote"}}, "2026-05-22": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Carrot Ginger Soup (GF)", "entree": "Tuna Melt on English Muffin with Sliced Tomato and Garden Salad", "sides": [], "dessert": "Ice Cream Sundae"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Carrot Ginger Soup (GF)", "entree": "Hunters Chicken", "sides": ["Basmati Rice", "Brussel Sprouts", "Sauteed Yellow Zucchini"], "dessert": "Strawberry Short Cake"}}, "2026-05-23": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Roasted Vegetable Soup (GF)", "entree": "BLT and Fries", "sides": [], "dessert": "Chocolate Pudding and Strawberries"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Roasted Vegetable Soup (GF)", "entree": "Chicken Pot Pie", "sides": ["Mashed Dijon Potatoes", "Steamed Carrots", "Sauteed Yellow Zucchini"], "dessert": "Maple Chocolate Cake"}}, "2026-05-24": {"lunch": {"time": "11:30 a.m. \u2013 2:00 p.m.", "starter": "Green Pea and Spinach Soup (GF)", "entree": "Western Sandwich on Whole Wheat Bread with Garden Salad", "sides": [], "dessert": "Fresh Fruit"}, "dinner": {"time": "4:30 p.m. \u2013 7:00 p.m.", "starter": "Green Pea and Spinach Soup (GF)", "entree": "Turkey Roast with White Wine Gravy and Cranberry Sauce", "sides": ["Mashed Sweet Potato", "Steamed Parsnips", "Butter Peas"], "dessert": "Cherry Pie"}}};
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function setToday() { document.getElementById('selected-date').value = todayStr(); loadForDate(); }
+
+function getDate() { return document.getElementById('selected-date').value || todayStr(); }
+
+function loadCustom() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch(e) { return {}; } }
+function saveCustom(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+function getMenuForDate(date) {
+  const custom = loadCustom();
+  if (custom[date]) return custom[date];
+  return DEFAULT_MENUS[date] || null;
+}
+
+function addSide(prefix) {
+  const list = document.getElementById(prefix+'-sides');
+  const row = document.createElement('div');
+  row.className = 'side-row';
+  row.innerHTML = `<input type="text" placeholder="e.g. Mashed Potatoes">
+    <button class="remove-side" onclick="this.parentElement.remove();updatePreview()">Remove</button>`;
+  row.querySelector('input').addEventListener('input', updatePreview);
+  list.appendChild(row);
+}
+
+function getSides(prefix) {
+  return [...document.querySelectorAll('#'+prefix+'-sides .side-row input')]
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+function setSides(prefix, sides) {
+  const list = document.getElementById(prefix+'-sides');
+  list.innerHTML = '';
+  (sides||[]).forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'side-row';
+    row.innerHTML = `<input type="text" value="${s}">
+      <button class="remove-side" onclick="this.parentElement.remove();updatePreview()">Remove</button>`;
+    row.querySelector('input').addEventListener('input', updatePreview);
+    list.appendChild(row);
+  });
+}
+
+function loadForDate() {
+  const date = getDate();
+  const menu = getMenuForDate(date);
+  if (menu) {
+    // Lunch
+    document.getElementById('l-starter').value = menu.lunch?.starter || '';
+    document.getElementById('l-entree').value = menu.lunch?.entree || '';
+    document.getElementById('l-dessert').value = menu.lunch?.dessert || '';
+    setSides('l', menu.lunch?.sides || []);
+    // Dinner
+    document.getElementById('d-starter').value = menu.dinner?.starter || '';
+    document.getElementById('d-entree').value = menu.dinner?.entree || '';
+    document.getElementById('d-dessert').value = menu.dinner?.dessert || '';
+    setSides('d', menu.dinner?.sides || []);
+  } else {
+    clearForm();
+  }
+  updatePreview();
+}
+
+function clearForm() {
+  ['l-starter','l-entree','l-dessert','d-starter','d-entree','d-dessert'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('l-sides').innerHTML='';
+  document.getElementById('d-sides').innerHTML='';
+  updatePreview();
+}
+
+function updatePreview() {
+  const ls = document.getElementById('l-starter').value.trim();
+  const le = document.getElementById('l-entree').value.trim();
+  const ld = document.getElementById('l-dessert').value.trim();
+  const lsides = getSides('l');
+  const ds = document.getElementById('d-starter').value.trim();
+  const de = document.getElementById('d-entree').value.trim();
+  const dd = document.getElementById('d-dessert').value.trim();
+  const dsides = getSides('d');
+
+  const hasAny = ls||le||ld||ds||de||dd;
+  const preview = document.getElementById('preview');
+  if (!hasAny) { preview.style.display='none'; return; }
+  preview.style.display='block';
+
+  let html = '';
+  if (ls||le||ld) {
+    html += `<div class="preview-meal">
+      <div class="preview-meal-title" style="color:#0ea5e9">🌤️ Lunch · 11:30 a.m. – 2:00 p.m.</div>
+      ${ls?`<div class="preview-row"><span class="preview-label">Starter</span><span class="preview-val">${ls}</span></div>`:''}
+      ${le?`<div class="preview-row"><span class="preview-label">Entrée</span><span class="preview-val">${le}</span></div>`:''}
+      ${lsides.length?`<div class="preview-row"><span class="preview-label">Sides</span><span class="preview-val">${lsides.join(', ')}</span></div>`:''}
+      ${ld?`<div class="preview-row"><span class="preview-label">Dessert</span><span class="preview-val">${ld}</span></div>`:''}
+    </div>`;
+  }
+  if (ds||de||dd) {
+    html += `<div class="preview-meal">
+      <div class="preview-meal-title" style="color:#6366f1">🌙 Dinner · 4:30 p.m. – 7:00 p.m.</div>
+      ${ds?`<div class="preview-row"><span class="preview-label">Starter</span><span class="preview-val">${ds}</span></div>`:''}
+      ${de?`<div class="preview-row"><span class="preview-label">Entrée</span><span class="preview-val">${de}</span></div>`:''}
+      ${dsides.length?`<div class="preview-row"><span class="preview-label">Sides</span><span class="preview-val">${dsides.join(', ')}</span></div>`:''}
+      ${dd?`<div class="preview-row"><span class="preview-label">Dessert</span><span class="preview-val">${dd}</span></div>`:''}
+    </div>`;
+  }
+  document.getElementById('preview-content').innerHTML = html;
+}
+
+function saveMenu() {
+  const date = getDate();
+  const custom = loadCustom();
+  custom[date] = {
+    lunch: {
+      time: "11:30 a.m. – 2:00 p.m.",
+      starter: document.getElementById('l-starter').value.trim(),
+      entree: document.getElementById('l-entree').value.trim(),
+      sides: getSides('l'),
+      dessert: document.getElementById('l-dessert').value.trim()
+    },
+    dinner: {
+      time: "4:30 p.m. – 7:00 p.m.",
+      starter: document.getElementById('d-starter').value.trim(),
+      entree: document.getElementById('d-entree').value.trim(),
+      sides: getSides('d'),
+      dessert: document.getElementById('d-dessert').value.trim()
+    }
+  };
+  saveCustom(custom);
+  const ok = document.getElementById('ok');
+  ok.style.display='block';
+  setTimeout(() => ok.style.display='none', 4000);
+}
+
+// Wire up live preview
+document.querySelectorAll('input[type=text], textarea').forEach(el => el.addEventListener('input', updatePreview));
+
+// Init
+setToday();
+</script>
+</body>
+</html>
